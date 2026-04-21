@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pole — цветы и букеты</title>
+
+<!-- Comfortaa -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
+
+  /* ---------- tokens ---------- */
+  :root {
+    --bg: #fbfaf6;
+    --ink: #1a1c17;
+    --ink-soft: #6a6d62;
+    --line: #e7e5dc;
+    --card: #f4f2ea;
+    --card-2: #efece1;
+    --accent: oklch(62% 0.13 95);   /* daisy-yolk mustard */
+    --r: 4px;
+    --maxw: 1440px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Comfortaa', system-ui, sans-serif;
+    font-weight: 400;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "kern";
+  }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- nav — liquid glass ---------- */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 48px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+
+    /* Стекло над hero — тёплый холодный намёк */
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow:
+      inset 0  1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -1px 0 rgba(0,   0,   0,   0.04),
+      0 4px 32px rgba(0, 0, 0, 0.12);
+
+    transition: background-color 0.6s ease, box-shadow 0.6s ease, color 0.6s ease, border-color 0.6s ease, padding 0.4s ease;
+  }
+
+  /* Состояние 2: залитый цвет поверх светлого контента */
+  .nav.scrolled {
+    color: var(--ink);
+    background: var(--bg);
+    border-bottom-color: var(--line);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 1px 12px rgba(26, 28, 23, 0.08);
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .nav__brand {
+    font-weight: 600;
+    letter-spacing: 0.18em;
+  }
+  .nav__links {
+    display: flex;
+    gap: 36px;
+  }
+  .nav__links a { opacity: 0.88; }
+  .nav__links a:hover { opacity: 1; }
+
+  /* ---------- liquid glass CTA buttons ---------- */
+  .hero__cta {
+    position: absolute;
+    bottom: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  .btn-glass {
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: lowercase;
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 32px;
+    border-radius: 999px;
+    cursor: pointer;
+
+    /* Стекло */
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.50);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    /* Объём: внешняя тень + блик inset */
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.18),
+      0 1px 4px  rgba(0, 0, 0, 0.10),
+      inset 0  1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -1px 0 rgba(0,   0,   0,   0.08);
+
+    transition:
+      background   300ms cubic-bezier(.2,.7,.2,1),
+      box-shadow   300ms cubic-bezier(.2,.7,.2,1),
+      transform    200ms cubic-bezier(.2,.7,.2,1);
+  }
+
+  .btn-glass:hover {
+    background: rgba(255, 255, 255, 0.20);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.22),
+      0 2px 8px  rgba(0, 0, 0, 0.12),
+      inset 0  1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -1px 0 rgba(0,   0,   0,   0.08);
+    transform: translateY(-2px);
+  }
+
+  /* Основная кнопка — чуть плотнее стекло */
+  .btn-glass--primary {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.60);
+  }
+  .btn-glass--primary:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 680px;
+    overflow: hidden;
+    background: #2a3520;
+  }
+  .hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+  }
+  .hero__vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%),
+      linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+  .hero__title-wrap {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 0 24px;
+  }
+
+  /* ---------- hero title ---------- */
+  .glass-title {
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: 700;
+    font-size: clamp(56px, 12vw, 200px);
+    line-height: 0.82;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-align: center;
+    text-transform: lowercase;
+    color: rgba(255, 255, 255, 0.96);
+    text-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.22),
+      0 1px 4px  rgba(0, 0, 0, 0.14);
+    transform: translateY(-16vh);
+    user-select: none;
+  }
+
+  .hero__caption {
+    position: absolute;
+    left: 48px;
+    bottom: 40px;
+    color: rgba(255,255,255,0.9);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: lowercase;
+    max-width: 280px;
+    line-height: 1.6;
+  }
+  .hero__scroll {
+    position: absolute;
+    right: 48px;
+    bottom: 40px;
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: lowercase;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .hero__scroll::after {
+    content: "";
+    width: 56px;
+    height: 1px;
+    background: rgba(255,255,255,0.7);
+  }
+
+  /* ---------- sections ---------- */
+  .section {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 140px 48px 60px;
+  }
+  .section__head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 72px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section__eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: lowercase;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+  .section__title {
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: 300;
+    font-size: clamp(36px, 5.2vw, 68px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-transform: lowercase;
+  }
+  .section__meta {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: lowercase;
+    color: var(--ink-soft);
+    padding-bottom: 6px;
+  }
+
+  /* ---------- grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  @media (max-width: 1024px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .section { padding: 100px 28px 40px; }
+    .section__head { margin-bottom: 48px; }
+    .nav { padding: 20px 24px; }
+    .hero__caption, .hero__scroll { left: 24px; right: 24px; bottom: 24px; }
+    .hero__scroll { left: auto; }
+  }
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- card ---------- */
+  .card {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    cursor: pointer;
+  }
+  .card__tile {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: var(--card);
+    border-radius: var(--r);
+    overflow: hidden;
+    transition: transform 400ms cubic-bezier(.2,.7,.2,1);
+  }
+  .card:hover .card__tile { transform: translateY(-4px); }
+
+  /* placeholder tiles — subtly striped */
+  .card__tile--placeholder {
+    background:
+      repeating-linear-gradient(
+        135deg,
+        var(--card) 0 14px,
+        var(--card-2) 14px 28px
+      );
+    display: grid;
+    place-items: center;
+  }
+  .card__tile--placeholder::after {
+    content: attr(data-label);
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: lowercase;
+    color: rgba(26, 28, 23, 0.38);
+    padding: 8px 12px;
+    background: rgba(251, 250, 246, 0.8);
+    border-radius: 2px;
+  }
+  .card__num {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .card__cart {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: rgba(251, 250, 246, 0.92);
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: all 300ms cubic-bezier(.2,.7,.2,1);
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .card:hover .card__cart { opacity: 1; transform: translateY(0); }
+
+  .card__foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 2px;
+  }
+  .card__name {
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-transform: lowercase;
+  }
+  .card__sub {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: lowercase;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .card__price {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .card__price small {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--ink-soft);
+    letter-spacing: 0.14em;
+    margin-left: 4px;
+  }
+
+  /* bouquets tiles are a touch richer — layered stripes */
+  .card__tile--bouquet {
+    background:
+      radial-gradient(120% 80% at 50% 120%, rgba(204,174,84,0.08), transparent 60%),
+      repeating-linear-gradient(
+        135deg,
+        var(--card) 0 14px,
+        var(--card-2) 14px 28px
+      );
+  }
+
+  /* ---------- footer ---------- */
+  .foot {
+    margin-top: 120px;
+    padding: 72px 48px 48px;
+    border-top: 1px solid var(--line);
+    background: #f1efe6;
+  }
+  .foot__inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 48px;
+  }
+  .foot__brand {
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    margin: 0 0 16px;
+  }
+  .foot__tag {
+    font-size: 12px;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    max-width: 280px;
+  }
+  .foot__col h4 {
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: lowercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin: 0 0 20px;
+  }
+  .foot__col ul {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+    text-transform: lowercase;
+  }
+  .foot__bottom {
+    max-width: var(--maxw);
+    margin: 64px auto 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: lowercase;
+    color: var(--ink-soft);
+  }
+  @media (max-width: 1024px) {
+    .foot { padding: 56px 28px 32px; }
+    .foot__inner { grid-template-columns: 1fr 1fr; gap: 36px; }
+    .foot__bottom { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG filter for liquid-glass displacement + chromatic hint -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="liquid-glass" x="-10%" y="-20%" width="120%" height="140%" color-interpolation-filters="sRGB">
+      <!-- organic noise -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="noise"/>
+      <!-- displace the text edges to mimic refraction -->
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+      <!-- soften -->
+      <feGaussianBlur in="disp" stdDeviation="0.4" result="soft"/>
+      <!-- tiny inner shadow for water-drop volume -->
+      <feMorphology in="soft" operator="erode" radius="1" result="eroded"/>
+      <feGaussianBlur in="eroded" stdDeviation="2" result="innerBlur"/>
+      <feComposite in="innerBlur" in2="soft" operator="arithmetic" k2="-1" k3="1" result="innerShadow"/>
+      <feColorMatrix in="innerShadow" type="matrix" values="
+        0 0 0 0 0
+        0 0 0 0 0
+        0 0 0 0 0
+        0 0 0 0.55 0" result="innerShadowDark"/>
+      <feMerge>
+        <feMergeNode in="soft"/>
+        <feMergeNode in="innerShadowDark"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<nav class="nav">
+  <div class="nav__brand">pole</div>
+  <div class="nav__links">
+    <a href="#">корзина · 0</a>
+    <a href="cabinet.html">кабинет</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" data-screen-label="01 Hero">
+  <img class="hero__img" src="images/hero.jpg" alt="" id="hero-img">
+  <div class="hero__vignette"></div>
+  <div class="hero__title-wrap">
+    <h1 class="glass-title" data-text="pole">pole</h1>
+  </div>
+  <div class="hero__caption">
+    свежесобранные полевые цветы<br>
+    москва · доставка в день заказа
+  </div>
+  <div class="hero__scroll">прокрутить вниз</div>
+</header>
+
+<!-- SINGLES -->
+<section class="section" id="singles" data-screen-label="02 Singles">
+  <div class="section__head">
+    <div>
+      <div class="section__eyebrow">— 01 / одиночные</div>
+      <h2 class="section__title">одиночные цветы</h2>
+    </div>
+    <div class="section__meta">8 позиций</div>
+  </div>
+
+  <div class="grid" id="singles-grid"></div>
+</section>
+
+<!-- BOUQUETS -->
+<section class="section" id="bouquets" data-screen-label="03 Bouquets">
+  <div class="section__head">
+    <div>
+      <div class="section__eyebrow">— 02 / букеты</div>
+      <h2 class="section__title">готовые букеты</h2>
+    </div>
+    <div class="section__meta">8 композиций</div>
+  </div>
+
+  <div class="grid" id="bouquets-grid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot" data-screen-label="04 Footer">
+  <div class="foot__inner">
+    <div>
+      <h3 class="foot__brand">pole</h3>
+      <p class="foot__tag">цветы, собранные вручную. без лишнего — только стебель, вода и свет.</p>
+    </div>
+    <div class="foot__col">
+      <h4>каталог</h4>
+      <ul>
+        <li><a href="#singles">одиночные</a></li>
+        <li><a href="#bouquets">букеты</a></li>
+        <li><a href="#">сезонное</a></li>
+        <li><a href="#">подписка</a></li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <h4>помощь</h4>
+      <ul>
+        <li><a href="#">доставка</a></li>
+        <li><a href="#">оплата</a></li>
+        <li><a href="#">уход</a></li>
+        <li><a href="#">контакты</a></li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <h4>связь</h4>
+      <ul>
+        <li>+7 (495) 000-00-00</li>
+        <li><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e78f828b8b88a797888b82c9818b8890829594">[email&#160;protected]</a></li>
+        <li>telegram · instagram</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__bottom">
+    <div>© 2026 pole</div>
+    <div>собрано с любовью в москве</div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" defer></script><script>
+  /* hero image loaded via src attribute */
+  /* src set directly on img element */
+  // product data
+  const singles = [
+    { name: "ромашка",   sub: "matricaria",     price: 120 },
+    { name: "василёк",   sub: "centaurea",      price: 140 },
+    { name: "эустома",   sub: "eustoma",        price: 320 },
+    { name: "тюльпан",   sub: "tulipa",         price: 180 },
+    { name: "пион",      sub: "paeonia",        price: 480 },
+    { name: "ранункулюс",sub: "ranunculus",     price: 260 },
+    { name: "анемон",    sub: "anemone",        price: 290 },
+    { name: "гвоздика",  sub: "dianthus",       price: 150 },
+  ];
+
+  const bouquets = [
+    { name: "июль",      sub: "ромашки · травы",            price: 2400 },
+    { name: "раннее",    sub: "тюльпаны · эвкалипт",        price: 2800 },
+    { name: "туман",     sub: "эустома · лаванда",          price: 3600 },
+    { name: "полдень",   sub: "пионы · роза кустовая",      price: 5200 },
+    { name: "садовое",   sub: "ранункулюсы · мята",         price: 3900 },
+    { name: "акварель",  sub: "анемоны · хлопок",           price: 4100 },
+    { name: "песок",     sub: "сухоцвет · пшеница",         price: 1900 },
+    { name: "полевое",   sub: "васильки · нивяник",         price: 2200 },
+  ];
+
+  const fmt = (n) => n.toLocaleString('ru-RU') + ' ₽';
+
+  function renderGrid(id, items, kind) {
+    const root = document.getElementById(id);
+    root.innerHTML = items.map((it, i) => `
+      <article class="card">
+        <div class="card__tile card__tile--placeholder ${kind === 'bouquet' ? 'card__tile--bouquet' : ''}"
+             data-label="${kind === 'bouquet' ? 'bouquet shot' : it.sub}">
+          <span class="card__num">0${i + 1}</span>
+          <span class="card__cart" aria-label="в корзину">+</span>
+        </div>
+        <div class="card__foot">
+          <div>
+            <div class="card__name">${it.name}</div>
+            <div class="card__sub">${it.sub}</div>
+          </div>
+          <div class="card__price">${fmt(it.price)}<small>${kind === 'bouquet' ? '/шт' : '/стебель'}</small></div>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  renderGrid('singles-grid', singles, 'single');
+  renderGrid('bouquets-grid', bouquets, 'bouquet');
+
+  /* Умный хедер: прозрачный над hero, плотный при скролле */
+  (function () {
+    const nav  = document.querySelector('.nav');
+    const hero = document.querySelector('.hero');
+
+    function update() {
+      /* Переключаем класс строго после полного скролла hero (100vh) */
+      const threshold = hero ? hero.offsetHeight : window.innerHeight;
+      nav.classList.toggle('scrolled', window.scrollY >= threshold);
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update(); /* начальное состояние при загрузке */
+  }());
+</script>
+</body>
+</html>
